@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ŞakaLab - Link Paylaşılabilir Şakalar!</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            background-color: #f9f7f0;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #ff6b6b;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            background-color: #ff9e7d;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #ff7b54;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+        #imagePreview {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .step {
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+        #linkContainer {
+            margin: 20px;
+            padding: 15px;
+            background-color: #e9f7ef;
+            border-radius: 10px;
+            display: none;
+        }
+        #prankLink {
+            width: 80%;
+            padding: 10px;
+            border: 2px dashed #4CAF50;
+            border-radius: 5px;
+            background-color: white;
+            font-size: 14px;
+        }
+        .copy-btn {
+            background-color: #4CAF50;
+            padding: 10px 15px;
+        }
+        textarea {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .prank-result {
+            animation: bounce 0.5s;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤪 ŞakaLab - Link ile Paylaş! 🤪</h1>
+        <p>Arkadaşlarını şaşırtacak eğlenceli şakalar oluştur ve link ile paylaş!</p>
+        
+        <div id="step1" class="step">
+            <h2>1. Resmini Yükle</h2>
+            <input type="file" id="imageUpload" accept="image/*">
+            <p>veya</p>
+            <button onclick="useSampleImage()">Örnek Resim Kullan</button>
+            <img id="imagePreview" src="" alt="Önizleme">
+        </div>
+        
+        <div id="step2" class="step" style="display:none;">
+            <h2>2. Şaka Metnini Yaz</h2>
+            <textarea id="prankText" placeholder="Örneğin: 'Tebrikler! 1 Milyon Dolar Kazandın!'"></textarea>
+            <button onclick="generatePrank()">Şakayı Oluştur</button>
+        </div>
+        
+        <div id="resultContainer" style="display:none;">
+            <!-- Şaka burada gösterilecek -->
+        </div>
+        
+        <div id="linkContainer">
+            <h3>Şaka Linkin:</h3>
+            <input type="text" id="prankLink" readonly>
+            <button class="copy-btn" onclick="copyLink()">Linki Kopyala</button>
+            <div id="socialShare" style="margin-top:15px;">
+                <button onclick="shareOnWhatsApp()">WhatsApp'ta Paylaş</button>
+                <button onclick="shareOnTwitter()">Twitter'da Paylaş</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global değişkenler
+        let selectedImage = null;
+        let prankId = null;
+        
+        // Resim yükleme eventi
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                selectedImage = e.target.files[0];
+                const preview = document.getElementById('imagePreview');
+                preview.src = URL.createObjectURL(selectedImage);
+                preview.style.display = 'block';
+                document.getElementById('step2').style.display = 'block';
+            }
+        });
+        
+        function useSampleImage() {
+            selectedImage = 'sample';
+            document.getElementById('imagePreview').src = 'https://i.imgur.com/8UOLVr5.jpeg';
+            document.getElementById('imagePreview').style.display = 'block';
+            document.getElementById('step2').style.display = 'block';
+        }
+        
+        function generatePrank() {
+            const prankText = document.getElementById('prankText').value || "Tebrikler! Büyük ödülü kazandın! 🎉";
+            prankId = 'prank-' + Math.random().toString(36).substr(2, 9);
+            
+            document.getElementById('resultContainer').innerHTML = `
+                <div class="prank-result">
+                    <h2>${prankText}</h2>
+                    <img src="${selectedImage === 'sample' ? 'https://i.imgur.com/8UOLVr5.jpeg' : URL.createObjectURL(selectedImage)}" 
+                         style="max-width:100%; border-radius:10px; margin:15px 0;">
+                    <p>Bu linki arkadaşlarına gönder ve onları şaşırt! 😄</p>
+                </div>
+            `;
+            
+            const currentUrl = window.location.href.split('?')[0];
+            const shareLink = `${currentUrl}?id=${prankId}`;
+            document.getElementById('prankLink').value = shareLink;
+            
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('resultContainer').style.display = 'block';
+            document.getElementById('linkContainer').style.display = 'block';
+            
+            if(selectedImage !== 'sample') {
+                savePrankToStorage(prankId, prankText);
+            }
+        }
+        
+        function savePrankToStorage(id, text) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const pranks = JSON.parse(localStorage.getItem('pranks') || '{}');
+                pranks[id] = {
+                    text: text,
+                    image: e.target.result
+                };
+                localStorage.setItem('pranks', JSON.stringify(pranks));
+            };
+            reader.readAsDataURL(selectedImage);
+        }
+        
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const prankIdFromUrl = urlParams.get('id');
+            
+            if(prankIdFromUrl) {
+                showPrankFromLink(prankIdFromUrl);
+            }
+        };
+        
+        function showPrankFromLink(id) {
+            const pranks = JSON.parse(localStorage.getItem('pranks') || '{}');
+            const prank = pranks[id];
+            
+            if(prank) {
+                document.querySelector('.container').innerHTML = `
+                    <div class="prank-result" style="padding:30px;">
+                        <h2>${prank.text}</h2>
+                        <img src="${prank.image}" style="max-width:100%; border-radius:10px; margin:20px 0;">
+                        <p>ŞakaLab ile oluşturuldu. 😄</p>
+                        <button onclick="window.location.href=window.location.href.split('?')[0]">Kendi Şakanı Oluştur</button>
+                    </div>
+                `;
+            }
+        }
+        
+        function copyLink() {
+            const linkInput = document.getElementById('prankLink');
+            linkInput.select();
+            document.execCommand('copy');
+            alert('Link kopyalandı!');
+        }
+        
+        function shareOnWhatsApp() {
+            const link = document.getElementById('prankLink').value;
+            window.open(`https://wa.me/?text=Şu komik şakaya bir bak: ${encodeURIComponent(link)}`);
+        }
+        
+        function shareOnTwitter() {
+            const link = document.getElementById('prankLink').value;
+            window.open(`https://twitter.com/intent/tweet?text=Şu komik şakaya bir bak!&url=${encodeURIComponent(link)}`);
+        }
+    </script>
+</body>
+</html>
